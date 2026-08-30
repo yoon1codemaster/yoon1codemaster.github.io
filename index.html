@@ -4,71 +4,492 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>귀여운지성</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            min-height: 100vh;
+            font-family: Arial, "Noto Sans KR", sans-serif;
+            color: white;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(100, 120, 255, 0.20), transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(180, 80, 255, 0.18), transparent 30%),
+                #070812;
+            overflow-x: hidden;
+        }
+
+        /* 배경 빛 */
+        .background {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .orb {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        .orb1 {
+            top: -100px;
+            left: -100px;
+            background: #5965ff;
+        }
+
+        .orb2 {
+            right: -100px;
+            bottom: -100px;
+            background: #b44cff;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(50px, -30px);
+            }
+        }
+
+        /* 메인 */
+        .wrapper {
+            width: min(680px, calc(100% - 30px));
+            margin: auto;
+            padding: 80px 0 50px;
+        }
+
+        /* 프로필 */
+        .profile {
             text-align: center;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 80px auto;
-            padding: 20px;
-        }
-
-        h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        p {
-            color: #666;
             margin-bottom: 35px;
         }
 
+        .avatar {
+            width: 95px;
+            height: 95px;
+            margin: auto;
+            border-radius: 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 35px;
+            font-weight: bold;
+
+            background: linear-gradient(
+                135deg,
+                rgba(255,255,255,0.18),
+                rgba(255,255,255,0.04)
+            );
+
+            border: 1px solid rgba(255,255,255,0.15);
+
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.35),
+                inset 0 1px rgba(255,255,255,0.15);
+
+            backdrop-filter: blur(20px);
+
+            animation: avatarFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes avatarFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        h1 {
+            margin: 22px 0 8px;
+            font-size: clamp(32px, 8vw, 52px);
+            letter-spacing: -2px;
+
+            background: linear-gradient(
+                90deg,
+                #ffffff,
+                #bfc6ff,
+                #ffffff
+            );
+
+            background-size: 200% auto;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .description {
+            color: rgba(255,255,255,0.55);
+            font-size: 15px;
+        }
+
+        /* 링크 */
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         .link {
-            display: block;
-            padding: 18px;
-            margin: 15px 0;
-            background: white;
-            color: #222;
+            position: relative;
+
+            display: flex;
+            align-items: center;
+
+            min-height: 72px;
+            padding: 15px 20px;
+
+            color: white;
             text-decoration: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: 0.2s;
+
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(255,255,255,0.10);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 15px 40px rgba(0,0,0,0.18),
+                inset 0 1px rgba(255,255,255,0.08);
+
+            overflow: hidden;
+
+            transition:
+                transform 0.3s ease,
+                border-color 0.3s ease,
+                background 0.3s ease,
+                box-shadow 0.3s ease;
+        }
+
+        .link::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.10),
+                transparent
+            );
+
+            transition: left 0.6s ease;
+        }
+
+        .link:hover::before {
+            left: 100%;
         }
 
         .link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 18px rgba(0,0,0,0.12);
+            transform: translateY(-5px) scale(1.01);
+
+            background: rgba(255,255,255,0.09);
+
+            border-color: rgba(255,255,255,0.25);
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,0.30),
+                0 0 30px rgba(100,110,255,0.10);
+        }
+
+        .icon {
+            width: 43px;
+            height: 43px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-right: 15px;
+
+            border-radius: 14px;
+
+            background: rgba(255,255,255,0.08);
+
+            font-size: 19px;
+        }
+
+        .link-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .link-title {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .link-description {
+            margin-top: 4px;
+            color: rgba(255,255,255,0.45);
+            font-size: 12px;
+        }
+
+        .arrow {
+            color: rgba(255,255,255,0.35);
+            font-size: 20px;
+
+            transition:
+                transform 0.3s ease,
+                color 0.3s ease;
+        }
+
+        .link:hover .arrow {
+            transform: translateX(5px);
+            color: white;
+        }
+
+        /* 푸터 */
+        footer {
+            text-align: center;
+            margin-top: 45px;
+            color: rgba(255,255,255,0.25);
+            font-size: 12px;
+        }
+
+        /* 모바일 */
+        @media (max-width: 500px) {
+            .wrapper {
+                padding-top: 50px;
+            }
+
+            .link {
+                min-height: 68px;
+            }
+        }
+
+        /* 클릭 효과 */
+        .click-effect {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+
+            border-radius: 50%;
+
+            pointer-events: none;
+
+            border: 1px solid rgba(255,255,255,0.7);
+
+            transform: translate(-50%, -50%);
+
+            animation: clickAnimation 0.6s ease-out forwards;
+        }
+
+        @keyframes clickAnimation {
+            0% {
+                width: 10px;
+                height: 10px;
+                opacity: 1;
+            }
+
+            100% {
+                width: 80px;
+                height: 80px;
+                opacity: 0;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
+<div class="background">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+</div>
+
+<main class="wrapper">
+
+    <section class="profile">
+
+        <div class="avatar">
+            JS
+        </div>
 
         <h1>귀여운지성</h1>
-        <p>나의 링크 모음</p>
 
-        <a class="link" href="https://www.youtube.com/" target="_blank">
-            YouTube
+        <div class="description">
+            나의 모든 링크를 한곳에서
+        </div>
+
+    </section>
+
+
+    <section class="links">
+
+        <a
+            class="link"
+            href="https://www.youtube.com/"
+            target="_blank"
+        >
+            <div class="icon">▶</div>
+
+            <div class="link-text">
+                <div class="link-title">YouTube</div>
+                <div class="link-description">
+                    YouTube 채널 방문하기
+                </div>
+            </div>
+
+            <div class="arrow">›</div>
         </a>
 
-        <a class="link" href="https://github.com/" target="_blank">
-            GitHub
+
+        <a
+            class="link"
+            href="https://github.com/"
+            target="_blank"
+        >
+            <div class="icon">⌘</div>
+
+            <div class="link-text">
+                <div class="link-title">GitHub</div>
+                <div class="link-description">
+                    GitHub 프로필 방문하기
+                </div>
+            </div>
+
+            <div class="arrow">›</div>
         </a>
 
-        <a class="link" href="https://www.roblox.com/" target="_blank">
-            Roblox
+
+        <a
+            class="link"
+            href="https://www.roblox.com/"
+            target="_blank"
+        >
+            <div class="icon">R</div>
+
+            <div class="link-text">
+                <div class="link-title">Roblox</div>
+                <div class="link-description">
+                    Roblox 프로필 방문하기
+                </div>
+            </div>
+
+            <div class="arrow">›</div>
         </a>
 
-    </div>
+
+        <a
+            class="link"
+            href="#"
+        >
+            <div class="icon">+</div>
+
+            <div class="link-text">
+                <div class="link-title">새로운 링크</div>
+                <div class="link-description">
+                    원하는 링크로 변경하세요
+                </div>
+            </div>
+
+            <div class="arrow">›</div>
+        </a>
+
+    </section>
+
+
+    <footer>
+        © 2026 귀여운지성
+    </footer>
+
+</main>
+
+
+<script>
+
+    /* 마우스 클릭 효과 */
+
+    document.addEventListener("click", function(event) {
+
+        const effect = document.createElement("div");
+
+        effect.className = "click-effect";
+
+        effect.style.left = event.clientX + "px";
+        effect.style.top = event.clientY + "px";
+
+        document.body.appendChild(effect);
+
+        setTimeout(() => {
+            effect.remove();
+        }, 600);
+
+    });
+
+
+    /* 링크에 마우스가 올라갔을 때 약간의 움직임 */
+
+    document.querySelectorAll(".link").forEach(link => {
+
+        link.addEventListener("mousemove", event => {
+
+            const rect = link.getBoundingClientRect();
+
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const rotateX =
+                ((y / rect.height) - 0.5) * -4;
+
+            const rotateY =
+                ((x / rect.width) - 0.5) * 4;
+
+            link.style.transform =
+                `perspective(700px)
+                 rotateX(${rotateX}deg)
+                 rotateY(${rotateY}deg)
+                 translateY(-4px)`;
+
+        });
+
+
+        link.addEventListener("mouseleave", () => {
+
+            link.style.transform = "";
+
+        });
+
+    });
+
+</script>
 
 </body>
 </html>
