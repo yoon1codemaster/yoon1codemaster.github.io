@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -86,6 +87,61 @@ body {
 
     50% {
         transform: translate(45px,-30px);
+    }
+}
+
+/* =========================
+   ㅇㅈㅅ 워터마크
+========================= */
+
+.watermark {
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    z-index: 9000;
+
+    pointer-events: none;
+    user-select: none;
+
+    color: rgba(255,255,255,.075);
+
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+
+    white-space: nowrap;
+
+    text-shadow:
+        0 0 12px rgba(255,255,255,.03);
+
+    animation: watermarkMove 28s ease-in-out infinite alternate;
+}
+
+@keyframes watermarkMove {
+    0% {
+        transform: translate(7vw, 14vh) rotate(-7deg);
+    }
+
+    20% {
+        transform: translate(72vw, 22vh) rotate(4deg);
+    }
+
+    40% {
+        transform: translate(38vw, 55vh) rotate(-3deg);
+    }
+
+    60% {
+        transform: translate(82vw, 72vh) rotate(6deg);
+    }
+
+    80% {
+        transform: translate(18vw, 82vh) rotate(-5deg);
+    }
+
+    100% {
+        transform: translate(62vw, 40vh) rotate(3deg);
     }
 }
 
@@ -210,6 +266,127 @@ body {
         0 0 25px rgba(90,100,255,.15);
 }
 
+/* =========================
+   가짜 보안 확인
+========================= */
+
+.fakeCaptcha {
+    width: 100%;
+
+    margin-top: 14px;
+    margin-bottom: 2px;
+
+    padding: 13px 14px;
+
+    display: flex;
+    align-items: center;
+
+    text-align: left;
+
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+
+    background: rgba(255,255,255,.045);
+
+    box-shadow:
+        inset 0 1px rgba(255,255,255,.04);
+
+    cursor: pointer;
+
+    transition:
+        background .25s,
+        border-color .25s,
+        transform .2s;
+}
+
+.fakeCaptcha:hover {
+    background: rgba(255,255,255,.065);
+    border-color: rgba(255,255,255,.2);
+}
+
+.fakeCaptcha:active {
+    transform: scale(.99);
+}
+
+.captchaCheck {
+    width: 27px;
+    height: 27px;
+
+    flex-shrink: 0;
+
+    margin-right: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid rgba(255,255,255,.4);
+    border-radius: 5px;
+
+    background: rgba(0,0,0,.2);
+
+    font-size: 17px;
+
+    transition: .25s;
+}
+
+.fakeCaptcha.verifying .captchaCheck {
+    border-color: #8d98ff;
+
+    animation: captchaPulse .8s infinite;
+}
+
+.fakeCaptcha.success .captchaCheck {
+    border-color: #73e6a0;
+    background: rgba(80,200,120,.16);
+
+    color: #8dffb4;
+}
+
+@keyframes captchaPulse {
+    0%,100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .4;
+    }
+}
+
+.captchaText {
+    flex: 1;
+
+    font-size: 14px;
+
+    color: rgba(255,255,255,.82);
+}
+
+.captchaStatus {
+    margin-top: 3px;
+
+    color: rgba(255,255,255,.38);
+
+    font-size: 10px;
+}
+
+.captchaLogo {
+    margin-left: 8px;
+
+    color: rgba(255,255,255,.25);
+
+    font-size: 9px;
+
+    text-align: center;
+}
+
+.captchaLogo strong {
+    display: block;
+
+    color: rgba(255,255,255,.38);
+
+    font-size: 13px;
+}
+
 .unlockButton {
     width: 100%;
     height: 54px;
@@ -241,6 +418,13 @@ body {
 
     box-shadow:
         0 15px 35px rgba(80,90,255,.3);
+}
+
+.unlockButton:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 #error {
@@ -728,11 +912,26 @@ footer {
     .link {
         min-height: 68px;
     }
+
+    .watermark {
+        font-size: 11px;
+    }
 }
 </style>
+
 </head>
 
 <body>
+
+<!-- =========================
+     움직이는 워터마크
+========================= -->
+
+<div class="watermark">ㅇㅈㅅ</div>
+
+<!-- =========================
+     배경
+========================= -->
 
 <div class="background">
     <div class="grid"></div>
@@ -740,46 +939,85 @@ footer {
     <div class="orb two"></div>
 </div>
 
-
 <!-- =========================
      암호 화면
 ========================= -->
 
 <div id="lockScreen">
 
-    <div class="lockBox">
+```
+<div class="lockBox">
 
-        <div class="lockIcon">
-            🔒
+    <div class="lockIcon">
+        🔒
+    </div>
+
+    <h2>잠긴 페이지</h2>
+
+    <p>
+        계속하려면 암호를 입력하세요.
+    </p>
+
+    <input
+        id="passwordInput"
+        class="passwordInput"
+        type="password"
+        placeholder="1234임"
+        autocomplete="off"
+    >
+
+    <!-- =========================
+         가짜 reCAPTCHA 스타일 확인
+    ========================= -->
+
+    <div
+        id="fakeCaptcha"
+        class="fakeCaptcha"
+        onclick="verifyCaptcha()"
+    >
+
+        <div
+            id="captchaCheck"
+            class="captchaCheck"
+        ></div>
+
+        <div class="captchaText">
+
+            <div id="captchaMainText">
+                로봇이 아닙니다
+            </div>
+
+            <div
+                id="captchaStatus"
+                class="captchaStatus"
+            >
+                보안 확인을 진행하려면 클릭하세요
+            </div>
+
         </div>
 
-        <h2>잠긴 페이지</h2>
-
-        <p>
-            계속하려면 암호를 입력하세요.
-        </p>
-
-        <input
-            id="passwordInput"
-            class="passwordInput"
-            type="password"
-            placeholder="1234임"
-            autocomplete="off"
-        >
-
-        <button
-            class="unlockButton"
-            onclick="unlock()"
-        >
-            잠금 해제
-        </button>
-
-        <div id="error"></div>
+        <div class="captchaLogo">
+            <strong>✓</strong>
+            SECURE
+        </div>
 
     </div>
 
-</div>
 
+    <button
+        id="unlockButton"
+        class="unlockButton"
+        onclick="unlock()"
+    >
+        잠금 해제
+    </button>
+
+    <div id="error"></div>
+
+</div>
+```
+
+</div>
 
 <!-- =========================
      메인
@@ -787,227 +1025,246 @@ footer {
 
 <main id="mainPage">
 
-    <div class="wrapper">
+```
+<div class="wrapper">
 
-        <section class="profile">
+    <section class="profile">
 
-            <div class="avatar">
-                JS
+        <div class="avatar">
+            JS
+        </div>
+
+        <h1>귀여운지성</h1>
+
+        <div class="description">
+            :D
+        </div>
+
+    </section>
+
+
+    <section class="links">
+
+        <a
+            class="link"
+            href="https://retrogaming.dpdns.org/game.html?id=starcraft"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+
+            <div class="icon">ST</div>
+
+            <div class="linkText">
+
+                <div class="linkTitle">
+                    스타크래프트(웹버전)
+                </div>
+
+                <div class="linkDescription">
+                    "당신의 명령을 기다립니다, 사령관."
+                </div>
+
             </div>
 
-            <h1>귀여운지성</h1>
+            <div class="arrow">›</div>
 
-            <div class="description">
-                :D
+        </a>
+
+
+        <a
+            class="link"
+            href="https://kripken.github.io/BananaBread/cube2/bb.html"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+
+            <div class="icon">FPS</div>
+
+            <div class="linkText">
+
+                <div class="linkTitle">
+                    학교에서 안 막힌 총게임
+                </div>
+
+                <div class="linkDescription">
+                    총게임 바로가기
+                </div>
+
             </div>
 
-        </section>
+            <div class="arrow">›</div>
+
+        </a>
 
 
-        <section class="links">
-            <a
-    class="link"
-    href="https://retrogaming.dpdns.org/game.html?id=starcraft"
-    target="_blank"
-    rel="noopener noreferrer"
->
-    <div class="icon">ST</div>
+        <a
+            class="link"
+            href="https://mrmeowzz.github.io/Funkin-MrMeowzz/web/"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
 
-    <div class="linkText">
-        <div class="linkTitle">
-            스타크래프트(웹버전)
-        </div>
+            <div class="icon">🎤</div>
 
-        <div class="linkDescription">
-            "당신의 명령을 기다립니다, 사령관."
-        </div>
-    </div>
+            <div class="linkText">
 
-    <div class="arrow">›</div>
-</a>
-           
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            <a
-    class="link"
-    href="https://kripken.github.io/BananaBread/cube2/bb.html"
-    target="_blank"
-    rel="noopener noreferrer"
->
-    <div class="icon">FPS</div>
-
-    <div class="linkText">
-        <div class="linkTitle">
-            학교에서 안 막힌 총게임
-        </div>
-
-        <div class="linkDescription">
-            총게임 바로가기
-        </div>
-    </div>
-
-    <div class="arrow">›</div>
-</a>
-
-
-
-
-            <a
-    class="link"
-    href="https://mrmeowzz.github.io/Funkin-MrMeowzz/web/"
-    target="_blank"
-    rel="noopener noreferrer"
->
-    <div class="icon">🎤</div>
-
-    <div class="linkText">
-        <div class="linkTitle">
-            FNF
-        </div>
-
-        <div class="linkDescription">
-            FNF 바로가기
-        </div>
-    </div>
-
-    <div class="arrow">›</div>
-</a>
-            <a
-                class="link"
-                href="https://www.youtube.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                <div class="icon">▶</div>
-
-                <div class="linkText">
-                    <div class="linkTitle">
-                        YouTube
-                    </div>
-
-                    <div class="linkDescription">
-                        YouTube 방문하기
-                    </div>
+                <div class="linkTitle">
+                    FNF
                 </div>
 
-                <div class="arrow">›</div>
-            </a>
-
-
-            <a
-                class="link"
-                href="https://github.com/yoon1codemaster"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                <div class="icon">⌘</div>
-
-                <div class="linkText">
-                    <div class="linkTitle">
-                        GitHub
-                    </div>
-
-                    <div class="linkDescription">
-                        GitHub 방문하기
-                    </div>
+                <div class="linkDescription">
+                    FNF 바로가기
                 </div>
 
-                <div class="arrow">›</div>
-            </a>
+            </div>
+
+            <div class="arrow">›</div>
+
+        </a>
 
 
-            <a
-                class="link"
-                href="https://www.roblox.com/ko/users/11577130543/profile"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                <div class="icon">R</div>
+        <a
+            class="link"
+            href="https://www.youtube.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
 
-                <div class="linkText">
-                    <div class="linkTitle">
-                        Roblox
-                    </div>
+            <div class="icon">▶</div>
 
-                    <div class="linkDescription">
-                        Roblox 방문하기
-                    </div>
+            <div class="linkText">
+
+                <div class="linkTitle">
+                    YouTube
                 </div>
 
-                <div class="arrow">›</div>
-            </a>
+                <div class="linkDescription">
+                    YouTube 방문하기
+                </div>
 
+            </div>
+
+            <div class="arrow">›</div>
+
+        </a>
+
+
+        <a
+            class="link"
+            href="https://github.com/yoon1codemaster"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+
+            <div class="icon">⌘</div>
+
+            <div class="linkText">
+
+                <div class="linkTitle">
+                    GitHub
+                </div>
+
+                <div class="linkDescription">
+                    GitHub 방문하기
+                </div>
+
+            </div>
+
+            <div class="arrow">›</div>
+
+        </a>
+
+
+        <a
+            class="link"
+            href="https://www.roblox.com/ko/users/11577130543/profile"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+
+            <div class="icon">R</div>
+
+            <div class="linkText">
+
+                <div class="linkTitle">
+                    Roblox
+                </div>
+
+                <div class="linkDescription">
+                    Roblox 방문하기
+                </div>
+
+            </div>
+
+            <div class="arrow">›</div>
+
+        </a>
+
+
+        <a
+            class="link"
+            href="#"
+            onclick="openMessage(); return false;"
+        >
+
+            <div class="icon">✉</div>
+
+            <div class="linkText">
+
+                <div class="linkTitle">
+                    지성에게 보내는 메시지
+                </div>
+
+                <div class="linkDescription">
+                    웹페이지에서 바로 메시지 보내기
+                </div>
+
+            </div>
+
+            <div class="arrow">›</div>
+
+        </a>
+
+    </section>
+
+
+    <footer>
+
+        <div class="footerLinks">
 
             <a
-                class="link"
+                href="#"
+                onclick="showPolicy('privacy'); return false;"
+            >
+                개인정보 처리방침
+            </a>
+
+            <a
+                href="#"
+                onclick="showPolicy('terms'); return false;"
+            >
+                서비스 이용약관
+            </a>
+
+            <a
                 href="#"
                 onclick="openMessage(); return false;"
             >
-                <div class="icon">✉</div>
-
-                <div class="linkText">
-                    <div class="linkTitle">
-                        지성에게 보내는 메시지
-                    </div>
-
-                    <div class="linkDescription">
-                        웹페이지에서 바로 메시지 보내기
-                    </div>
-                </div>
-
-                <div class="arrow">›</div>
+                지성에게 보내는 메시지
             </a>
 
-        </section>
+        </div>
 
+        <div>
+            © 2026 귀여운지성. All rights reserved.
+        </div>
 
-        <footer>
+    </footer>
 
-            <div class="footerLinks">
-
-                <a
-                    href="#"
-                    onclick="showPolicy('privacy'); return false;"
-                >
-                    개인정보 처리방침
-                </a>
-
-                <a
-                    href="#"
-                    onclick="showPolicy('terms'); return false;"
-                >
-                    서비스 이용약관
-                </a>
-
-                <a
-                    href="#"
-                    onclick="openMessage(); return false;"
-                >
-                    지성에게 보내는 메시지
-                </a>
-
-            </div>
-
-            <div>
-                © 2026 귀여운지성. All rights reserved.
-            </div>
-
-        </footer>
-
-    </div>
+</div>
+```
 
 </main>
-
 
 <!-- =========================
      메시지 모달
@@ -1019,76 +1276,75 @@ footer {
     onclick="closeOutside(event)"
 >
 
-    <div
-        class="modalBox"
-        onclick="event.stopPropagation()"
-    >
+```
+<div
+    class="modalBox"
+    onclick="event.stopPropagation()"
+>
 
-        <h2>
-            지성에게 보내는 메시지
-        </h2>
+    <h2>
+        지성에게 보내는 메시지
+    </h2>
 
-        <p class="modalInfo">
-            아래 내용을 작성하면 Formspree를 통해
-            메시지가 전송됩니다.
-        </p>
+    <p class="modalInfo">
+        아래 내용을 작성하면 Formspree를 통해
+        메시지가 전송됩니다.
+    </p>
 
-        <form
-            id="messageForm"
+    <form id="messageForm">
+
+        <input
+            id="senderName"
+            class="messageInput"
+            type="text"
+            name="name"
+            placeholder="이름"
+            required
         >
 
-            <input
-                id="senderName"
-                class="messageInput"
-                type="text"
-                name="name"
-                placeholder="이름"
-                required
+        <input
+            id="senderEmail"
+            class="messageInput"
+            type="email"
+            name="email"
+            placeholder="이메일"
+        >
+
+        <textarea
+            id="message"
+            class="messageTextarea"
+            name="message"
+            placeholder="메시지를 입력하세요."
+            required
+        ></textarea>
+
+        <div class="modalButtons">
+
+            <button
+                type="button"
+                onclick="closeMessage()"
             >
+                닫기
+            </button>
 
-            <input
-                id="senderEmail"
-                class="messageInput"
-                type="email"
-                name="email"
-                placeholder="이메일"
+            <button
+                class="send"
+                type="submit"
+                id="sendButton"
             >
+                메시지 보내기
+            </button>
 
-            <textarea
-                id="message"
-                class="messageTextarea"
-                name="message"
-                placeholder="메시지를 입력하세요."
-                required
-            ></textarea>
+        </div>
 
-            <div class="modalButtons">
+        <div id="sendStatus"></div>
 
-                <button
-                    type="button"
-                    onclick="closeMessage()"
-                >
-                    닫기
-                </button>
-
-                <button
-                    class="send"
-                    type="submit"
-                    id="sendButton"
-                >
-                    메시지 보내기
-                </button>
-
-            </div>
-
-            <div id="sendStatus"></div>
-
-        </form>
-
-    </div>
+    </form>
 
 </div>
+```
 
+</div>
 
 <!-- =========================
      개인정보 처리방침
@@ -1099,61 +1355,62 @@ footer {
     class="policy"
 >
 
-    <h1 class="policyTitle">
-        개인정보 처리방침
-    </h1>
+```
+<h1 class="policyTitle">
+    개인정보 처리방침
+</h1>
 
-    <h2>1. 개인정보의 수집</h2>
+<h2>1. 개인정보의 수집</h2>
 
-    <p>
-        귀여운지성 웹페이지는 기본적으로 회원가입을 요구하지 않습니다.
-        다만 이용자가 메시지 보내기 기능을 사용하는 경우,
-        이용자가 직접 입력하여 전송한 이름, 이메일 및 메시지 내용이
-        메시지 전달을 위해 처리될 수 있습니다.
-    </p>
+<p>
+    귀여운지성 웹페이지는 기본적으로 회원가입을 요구하지 않습니다.
+    다만 이용자가 메시지 보내기 기능을 사용하는 경우,
+    이용자가 직접 입력하여 전송한 이름, 이메일 및 메시지 내용이
+    메시지 전달을 위해 처리될 수 있습니다.
+</p>
 
-    <h2>2. 개인정보의 이용 목적</h2>
+<h2>2. 개인정보의 이용 목적</h2>
 
-    <p>
-        전송된 정보는 이용자의 메시지를 확인하고 필요한 경우
-        답변하기 위한 목적으로만 사용될 수 있습니다.
-    </p>
+<p>
+    전송된 정보는 이용자의 메시지를 확인하고 필요한 경우
+    답변하기 위한 목적으로만 사용될 수 있습니다.
+</p>
 
-    <h2>3. 개인정보의 저장</h2>
+<h2>3. 개인정보의 저장</h2>
 
-    <p>
-        본 웹페이지 자체에는 별도의 개인정보 데이터베이스가 없습니다.
-        메시지 전송 기능에는 외부 폼 처리 서비스인 Formspree가 사용됩니다.
-        전송된 정보의 처리 및 보관과 관련해서는 해당 서비스의 정책이
-        적용될 수 있습니다.
-    </p>
+<p>
+    본 웹페이지 자체에는 별도의 개인정보 데이터베이스가 없습니다.
+    메시지 전송 기능에는 외부 폼 처리 서비스인 Formspree가 사용됩니다.
+    전송된 정보의 처리 및 보관과 관련해서는 해당 서비스의 정책이
+    적용될 수 있습니다.
+</p>
 
-    <h2>4. 외부 서비스</h2>
+<h2>4. 외부 서비스</h2>
 
-    <p>
-        본 페이지에는 YouTube, GitHub, Roblox 등의 외부 사이트로
-        연결되는 링크가 포함될 수 있습니다.
-        외부 사이트를 이용할 경우 해당 사이트의 개인정보 처리방침이
-        적용될 수 있습니다.
-    </p>
+<p>
+    본 페이지에는 YouTube, GitHub, Roblox 등의 외부 사이트로
+    연결되는 링크가 포함될 수 있습니다.
+    외부 사이트를 이용할 경우 해당 사이트의 개인정보 처리방침이
+    적용될 수 있습니다.
+</p>
 
-    <h2>5. 문의</h2>
+<h2>5. 문의</h2>
 
-    <p>
-        개인정보 처리방침과 관련된 문의는
-        '지성에게 보내는 메시지' 기능을 이용할 수 있습니다.
-    </p>
+<p>
+    개인정보 처리방침과 관련된 문의는
+    '지성에게 보내는 메시지' 기능을 이용할 수 있습니다.
+</p>
 
-    <a
-        class="backButton"
-        href="#"
-        onclick="backHome(); return false;"
-    >
-        메인으로 돌아가기
-    </a>
+<a
+    class="backButton"
+    href="#"
+    onclick="backHome(); return false;"
+>
+    메인으로 돌아가기
+</a>
+```
 
 </section>
-
 
 <!-- =========================
      서비스 이용약관
@@ -1164,63 +1421,64 @@ footer {
     class="policy"
 >
 
-    <h1 class="policyTitle">
-        서비스 이용약관
-    </h1>
+```
+<h1 class="policyTitle">
+    서비스 이용약관
+</h1>
 
-    <h2>제1조 목적</h2>
+<h2>제1조 목적</h2>
 
-    <p>
-        본 약관은 귀여운지성이 운영하는 웹페이지의
-        이용과 관련된 기본적인 사항을 정하는 것을 목적으로 합니다.
-    </p>
+<p>
+    본 약관은 귀여운지성이 운영하는 웹페이지의
+    이용과 관련된 기본적인 사항을 정하는 것을 목적으로 합니다.
+</p>
 
-    <h2>제2조 서비스</h2>
+<h2>제2조 서비스</h2>
 
-    <p>
-        본 페이지는 여러 웹사이트 및 서비스를 쉽게 이용할 수 있도록
-        링크를 제공하는 것을 주요 목적으로 합니다.
-    </p>
+<p>
+    본 페이지는 여러 웹사이트 및 서비스를 쉽게 이용할 수 있도록
+    링크를 제공하는 것을 주요 목적으로 합니다.
+</p>
 
-    <h2>제3조 외부 링크</h2>
+<h2>제3조 외부 링크</h2>
 
-    <p>
-        본 페이지에서 제공되는 외부 링크는 제3자가 운영하는 서비스로
-        연결될 수 있습니다. 해당 서비스의 이용에는 각 서비스의
-        이용약관과 정책이 적용될 수 있습니다.
-    </p>
+<p>
+    본 페이지에서 제공되는 외부 링크는 제3자가 운영하는 서비스로
+    연결될 수 있습니다. 해당 서비스의 이용에는 각 서비스의
+    이용약관과 정책이 적용될 수 있습니다.
+</p>
 
-    <h2>제4조 이용자의 의무</h2>
+<h2>제4조 이용자의 의무</h2>
 
-    <p>
-        이용자는 본 페이지를 관련 법령 및 일반적인 인터넷 이용 질서에
-        맞게 이용해야 합니다. 타인에게 피해를 주거나 불법적인 목적으로
-        서비스를 이용해서는 안 됩니다.
-    </p>
+<p>
+    이용자는 본 페이지를 관련 법령 및 일반적인 인터넷 이용 질서에
+    맞게 이용해야 합니다. 타인에게 피해를 주거나 불법적인 목적으로
+    서비스를 이용해서는 안 됩니다.
+</p>
 
-    <h2>제5조 서비스 변경</h2>
+<h2>제5조 서비스 변경</h2>
 
-    <p>
-        운영자는 페이지의 디자인, 링크 및 기능을 변경할 수 있으며,
-        필요한 경우 일부 기능의 제공을 중단할 수 있습니다.
-    </p>
+<p>
+    운영자는 페이지의 디자인, 링크 및 기능을 변경할 수 있으며,
+    필요한 경우 일부 기능의 제공을 중단할 수 있습니다.
+</p>
 
-    <h2>제6조 약관 변경</h2>
+<h2>제6조 약관 변경</h2>
 
-    <p>
-        서비스의 변경이나 운영상의 필요에 따라 본 약관이 변경될 수 있습니다.
-    </p>
+<p>
+    서비스의 변경이나 운영상의 필요에 따라 본 약관이 변경될 수 있습니다.
+</p>
 
-    <a
-        class="backButton"
-        href="#"
-        onclick="backHome(); return false;"
-    >
-        메인으로 돌아가기
-    </a>
+<a
+    class="backButton"
+    href="#"
+    onclick="backHome(); return false;"
+>
+    메인으로 돌아가기
+</a>
+```
 
 </section>
-
 
 <script>
 
@@ -1273,6 +1531,70 @@ async function sha256(text) {
 
 
 /* ==========================================
+   가짜 보안 확인
+========================================== */
+
+let captchaVerified = false;
+let captchaVerifying = false;
+
+function verifyCaptcha() {
+
+    if (captchaVerified || captchaVerifying) {
+        return;
+    }
+
+    captchaVerifying = true;
+
+    const captcha =
+        document.getElementById("fakeCaptcha");
+
+    const check =
+        document.getElementById("captchaCheck");
+
+    const mainText =
+        document.getElementById("captchaMainText");
+
+    const status =
+        document.getElementById("captchaStatus");
+
+    captcha.classList.add("verifying");
+
+    mainText.textContent =
+        "확인 중...";
+
+    status.textContent =
+        "보안 확인을 진행하고 있습니다.";
+
+    check.textContent =
+        "•";
+
+
+    /* 항상 정상 통과 */
+
+    setTimeout(() => {
+
+        captcha.classList.remove("verifying");
+
+        captcha.classList.add("success");
+
+        captchaVerified = true;
+        captchaVerifying = false;
+
+        check.textContent =
+            "✓";
+
+        mainText.textContent =
+            "인증되었습니다";
+
+        status.textContent =
+            "보안 확인이 완료되었습니다.";
+
+    }, 1100);
+
+}
+
+
+/* ==========================================
    암호 해제
 ========================================== */
 
@@ -1286,6 +1608,15 @@ async function unlock() {
     const error =
         document
             .getElementById("error");
+
+    if (!captchaVerified) {
+
+        error.textContent =
+            "먼저 보안 확인을 완료해주세요.";
+
+        return;
+
+    }
 
     if (!input) {
 
@@ -1311,6 +1642,8 @@ async function unlock() {
             .getElementById("mainPage")
             .style.display = "block";
 
+        error.textContent = "";
+
     } else {
 
         error.textContent =
@@ -1325,7 +1658,9 @@ async function unlock() {
 }
 
 
-/* Enter 키 */
+/* ==========================================
+   Enter 키
+========================================== */
 
 document
     .getElementById("passwordInput")
@@ -1527,6 +1862,7 @@ document.addEventListener(
             document.createElement("div");
 
         effect.style.position = "fixed";
+
         effect.style.left =
             event.clientX + "px";
 
@@ -1557,7 +1893,9 @@ document.addEventListener(
         requestAnimationFrame(() => {
 
             effect.style.width = "75px";
+
             effect.style.height = "75px";
+
             effect.style.opacity = "0";
 
         });
@@ -1623,3 +1961,4 @@ document
 </script>
 
 </body>
+</html>
